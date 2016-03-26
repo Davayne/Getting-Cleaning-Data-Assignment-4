@@ -1,27 +1,4 @@
-This file contains the code used in Assignmnet 4 of Getting and Cleaning data course. It explains how the script works.
 
-
-The script downloads the data for the aasingment and stores it in a zipped folder called "assignmentdat.zip" after setting the working directory and installing the Dplyr package that is used within analysis. (Step 1)
-
-The code then downloads the Test data into a data frame called 'test'. Also, the names of the columns within that data are downloaded into a frame called "features"; the activity labels are read into a file called "test_label"; the subjects who performed activities are read into a frame called 'test_label'.
-All are then combined by applying names, and then column binding the activity, subject and test dataframes using Cbind function into a final consolidated frame with all the Test data. (Steps 2 & 3)
-
-The same steps are then repeated for the Train data. (Steps 4 and 5)
-
-In step 6 we combine both the Test and Train data into one frame called 'Test_Train_Combined' using the rbind function.
-
-In step 7 I Extract the column numbers of variables that are measurements on Mean or standard deviation. I then use these to extract only those columns along with Subject & Activity into a new frame called 'Test_Train_Filtered'. (Step 8)
-
-In Step 9 I convert the activity Variable into a Factor Variable and change the Activity labels from numeric to more descriptive names.
-
-In Step 10 I remove characters "-" & "()" from Variable names and then rename all the variables using the rename function from DPLYR package to new names that were more descriptive and Tidy.
-
-In step 11 The data is partitioned and grouped by Activity & subject using group_by function. Then the average of all variables are calculated for all subjects and activity combinations. This is stored in the object final_summarized_data.
-
-lastly I show this data as a dataframe by printing it out to console.
-
-
-Script:
 ## Set Working Directory
 setwd("C://Users//Devayne//Desktop//Data Specialization Course//Getting & Cleaning Data//Assignment4")
 
@@ -69,21 +46,21 @@ train_subject <- read.table(train_subject_zipped, header= FALSE, sep = "", col.n
 train_final <- cbind(train_subject, train_label, train)
 
 
+
 ## Step 6: Combine the Test & Training files into one dataframe.
 Test_Train_Combined <- rbind(train_final, test_final)   
 
-
-## Step 7: get column number of variables with Mean & standard deviation
+## get column number of variables with Mean & standard deviation
 column_names <- names(Test_Train_Combined)
 names_data <-  grep("(mean\\(|std)", column_names)
 
-## Step 8: get only the columns that have Mean & Standard Deviation 
+# get only the columns that have Mean & Standard Deviation 
 Test_Train_Filtered <- cbind(Test_Train_Combined[, c(1,2)], data1[, names_data])
 Test_Train_Filtered <- arrange(Test_Train_Filtered, subject)
 
-
-##Step 9: Convert the Activity  into Factor Variables.
+## Convert the Activity & Subject Variable into Factor Variables.
 Test_Train_Filtered$activity <- as.factor(Test_Train_Filtered$activity)
+## Test_Train_Filtered$subject <- as.factor(Test_Train_Filtered$subject)
 
 ## Label the Activity with Descriptive Activity Names
 Test_Train_Filtered <- mutate(Test_Train_Filtered, activity = ifelse(activity == 1 , "walking",
@@ -92,7 +69,7 @@ Test_Train_Filtered <- mutate(Test_Train_Filtered, activity = ifelse(activity ==
                                       ifelse(activity == 4, "sitting" , 
                                       ifelse(activity == 5, "standing", "laying"))))))
 
-## Step 10: remove characters "-" & "()" from Variable names
+## remove characters "-" & "()" from Variable names
 adjustednames <- gsub("\\()","", (gsub("-","",names(Test_Train_Filtered))))
 names(Test_Train_Filtered) <- adjustednames
 
@@ -166,7 +143,7 @@ renamed_data <- rename(Test_Train_Filtered,
             StandardDeviationFourierBodyBodyGyrometerJerkMagnitude = fBodyBodyGyroJerkMagstd    )
    
  
-## Step 11: partition data by Subject & Activity then summarize to find mean per group.
+## partition data by Subject & Activity then summarize to find mean per group.
 grouped_data <- group_by(renamed_data, subject, activity)
 summarized_data <- summarize(grouped_data,  
                              MeanBodyAccelerometerX = mean(MeanBodyAccelerometerX, na.rm = TRUE), 
